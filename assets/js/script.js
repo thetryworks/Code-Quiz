@@ -1,63 +1,54 @@
 
-// Welcome Page Elements =====================================
-const welcomeEl = document.querySelector("#welcome");
-const startQuizBtnEl = document.querySelector("#startQuiz");
 
-//Quiz Page Elements =========================================
-const quizEl = document.querySelector("#quiz");
-const questionEl = document.querySelector("#question");
-const answersEl = document.querySelector("#answers");
-
-//Input Score Page Elements ==================================
-const inputScoreEl = document.querySelector("#inputScore");
-const initialsEl = document.querySelector("#initials");
-const submitInitialsBtnEl = document.querySelector("#submitInitials");
-const userScoreEl = document.querySelector("#score");
-
-//View High Scores Page Elements =============================
-const highScoresEl = document.querySelector("#highScores");
-const scoresEl = document.querySelector("#scores");
-const goBackBtnEl = document.querySelector("#goBack");
-const clearScoresBtnEl = document.querySelector("#clearScores");
-
-//Universal vars =============================================
-const viewHScoresBtnEl = document.querySelector("#viewHScores");
-const timerEl = document.querySelector("#timer");
+var startEl = document.querySelector("#welcome");
+var startQuizBtnEl = document.querySelector("#startQuiz");
+var quizEl = document.querySelector("#quiz");
+var questionEl = document.querySelector("#question");
+var answersEl = document.querySelector("#answers");
+var inputScoreEl = document.querySelector("#inputScore");
+var initialsEl = document.querySelector("#initials");
+var submitInitialsBtnEl = document.querySelector("#submitInitials");
+var userScoreEl = document.querySelector("#score");
+var highScoresEl = document.querySelector("#highScores");
+var scoresEl = document.querySelector("#scores");
+var goBackBtnEl = document.querySelector("#goBack");
+var clearScoresBtnEl = document.querySelector("#clearScores");
+var viewHScoresBtnEl = document.querySelector("#viewHScores");
+var timerEl = document.querySelector("#timer");
 var score = 0;
-var currentQ = 0;
+var currentQuestion = 0;
 var highScores = [];
 var interval;
-var timeGiven = 75;
+var timeAllowed = 75;
 var secondsElapsed = 0;
 
-//starts and updates timer
+
 function startTimer() {
-    timerEl.textContent = timeGiven;
+    timerEl.textContent = timeAllowed;
     interval = setInterval(function () {
         secondsElapsed++;
-        timerEl.textContent = timeGiven - secondsElapsed;
-        if (secondsElapsed >= timeGiven) {
-            currentQ = questions.length;
+        timerEl.textContent = timeAllowed - secondsElapsed;
+        if (secondsElapsed >= timeAllowed) {
+            currentQuestion = questions.length;
             nextQuestion();
         }
     }, 1000);
 }
 
-//stops timer
+
 function stopTimer() {
     clearInterval(interval);
 }
 
-//Clears current question and calls for display of next question
-//Calls for input score display if last question
+
 function nextQuestion() {
-    currentQ++;
-    if (currentQ < questions.length) {
-        renderQuestion();
+    currentQuestion++;
+    if (currentQuestion < questions.length) {
+        showQuestion();
     } else {
         stopTimer();
-        if ((timeGiven - secondsElapsed) > 0)
-            score += (timeGiven - secondsElapsed);
+        if ((timeAllowed - secondsElapsed) > 0)
+            score += (timeAllowed - secondsElapsed);
         userScoreEl.textContent = score;
         hide(quizEl);
         show(inputScoreEl);
@@ -65,9 +56,9 @@ function nextQuestion() {
     }
 }
 
-//checks answer based on current question and updates the user score
+
 function checkAnswer(answer) {
-    if (questions[currentQ].answer == questions[currentQ].choices[answer.id]) {
+    if (questions[currentQuestion].answer == questions[currentQuestion].choices[answer.id]) {
         score += 5;
         displayMessage("Correct!");
     }
@@ -77,7 +68,7 @@ function checkAnswer(answer) {
     }
 }
 
-//displays a message for 2 seconds
+
 function displayMessage(m) {
     let messageHr = document.createElement("hr");
     let messageEl = document.createElement("div");
@@ -87,41 +78,31 @@ function displayMessage(m) {
     setTimeout(function () {
             messageHr.remove();
             messageEl.remove();
-    }, 2000);
+    }, 1000);
 
 }
 
-//hides element
 function hide(element) {
     element.style.display = "none";
 }
-
-//displays element
 function show(element) {
     element.style.display = "block";
 }
-
-//reset local variables
 function reset() {
     score = 0;
-    currentQ = 0;
+    currentQuestion = 0;
     secondsElapsed = 0;
     timerEl.textContent = 0;
 }
-
-//=================== Rendering ================================
-
-//Renders current question
-function renderQuestion() {
-    questionEl.textContent = questions[currentQ].title;
+function showQuestion() {
+    questionEl.textContent = questions[currentQuestion].title;
     for (i = 0; i < answersEl.children.length; i++) {
-        answersEl.children[i].children[0].textContent = `${(i + 1)}: ${questions[currentQ].choices[i]}`;
+        answersEl.children[i].children[0].textContent = `${(i + 1)}: ${questions[currentQuestion].choices[i]}`;
     }
 }
 
-//Renders high scores stored in local storage
 function renderHighScores() {
-    // Clear content
+    
     scoresEl.innerHTML = "";
     show(highScoresEl);
     highScores = JSON.parse(localStorage.getItem("scores"));
@@ -135,12 +116,8 @@ function renderHighScores() {
     }
 }
 
-
-//=========================EVENTS================================
-
-//displays high scores
 viewHScoresBtnEl.addEventListener("click", function () {
-    hide(welcomeEl);
+    hide(startEl);
     hide(quizEl);
     hide(inputScoreEl);
     renderHighScores();
@@ -148,15 +125,13 @@ viewHScoresBtnEl.addEventListener("click", function () {
     reset();
 });
 
-//starts quiz from  Welcome page
 startQuizBtnEl.addEventListener("click", function () {
-    hide(welcomeEl);
+    hide(startEl);
     startTimer();
-    renderQuestion();
+    showQuestion();
     show(quizEl);
 });
 
-//Calls to check answer selected and calls to next question if button is clicked
 answersEl.addEventListener("click", function (e) {
     if (e.target.matches("button")) {
         checkAnswer(e.target);
@@ -164,8 +139,7 @@ answersEl.addEventListener("click", function (e) {
     }
 });
 
-//Creates a user score object to push to the local storage scores array calls to display high scores
-//calls to render high scores
+
 submitInitialsBtnEl.addEventListener("click", function () {
     let initValue = initialsEl.value.trim();
     if (initValue) {
@@ -180,13 +154,13 @@ submitInitialsBtnEl.addEventListener("click", function () {
     }
 });
 
-//Goes back to Welcome page from High scores 
+
 goBackBtnEl.addEventListener("click", function () {
     hide(highScoresEl);
-    show(welcomeEl);
+    show(startEl);
 });
 
-//Clears saved scores from local storage
+
 clearScoresBtnEl.addEventListener("click", function () {
     highScores = [];
     localStorage.setItem("scores", JSON.stringify(highScores));

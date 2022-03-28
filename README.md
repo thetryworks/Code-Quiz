@@ -1,4 +1,4 @@
-# Work Day Scheduler
+# Code-Quiz
 
 ## Purpose
 GIVEN I am taking a code quiz
